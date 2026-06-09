@@ -136,7 +136,7 @@ pub fn redirectLink(app: *App, req: *httpz.Request, res: *httpz.Response) !void 
     var conn = try app.db_pool.acquire(app.io);
     defer app.db_pool.release(app.io, conn);
 
-    const url = service.getLink(&conn, code) catch |err| switch (err) {
+    const url = service.getLink(&conn, res.arena, code) catch |err| switch (err) {
         error.NotFound => {
             res.status = 404;
             res.content_type = .HTML;

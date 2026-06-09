@@ -50,12 +50,12 @@ pub fn removeLink(conn: *zqlite.Conn, user_id: i64, code: []const u8) !void {
     try conn.exec("DELETE FROM link_link WHERE user_id = ? AND code = ?", .{ user_id, code });
 }
 
-pub fn getLink(conn: *zqlite.Conn, code: []const u8) ![]const u8 {
+pub fn getLink(conn: *zqlite.Conn, allocator: std.mem.Allocator, code: []const u8) ![]const u8 {
     var rows = try conn.rows("SELECT url FROM link_link WHERE code = ?", .{code});
     defer rows.deinit();
 
     if (rows.next()) |row| {
-        return row.text(0);
+        return try allocator.dupe(u8, row.text(0));
     }
     return error.NotFound;
 }

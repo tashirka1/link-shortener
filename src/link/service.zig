@@ -16,8 +16,8 @@ pub fn removeLink(conn: *zqlite.Conn, user_id: i64, code: []const u8) !void {
     return storage.removeLink(conn, user_id, code);
 }
 
-pub fn getLink(conn: *zqlite.Conn, code: []const u8) ![]const u8 {
-    return storage.getLink(conn, code);
+pub fn getLink(conn: *zqlite.Conn, allocator: std.mem.Allocator, code: []const u8) ![]const u8 {
+    return storage.getLink(conn, allocator, code);
 }
 
 pub fn clickLink(conn: *zqlite.Conn, code: []const u8) !void {
