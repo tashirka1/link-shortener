@@ -153,7 +153,10 @@ const static_files = std.StaticStringMap(StaticEntry).initComptime(.{
 
 fn serveStatic(_: *App, req: *httpz.Request, res: *httpz.Response) !void {
     const raw = req.url.raw;
-    const path = if (std.mem.startsWith(u8, raw, "/static/")) raw["/static/".len..] else raw;
+    const stripped = if (std.mem.startsWith(u8, raw, "/static/")) raw["/static/".len..] else raw;
+    if (stripped.len == 0) return notFound(res);
+
+    const path = if (std.mem.indexOfScalar(u8, stripped, '?')) |q| stripped[0..q] else stripped;
     if (path.len == 0) return notFound(res);
 
     const entry = static_files.get(path) orelse return notFound(res);
