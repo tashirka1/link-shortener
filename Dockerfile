@@ -14,7 +14,6 @@ RUN --mount=type=cache,target=/app/.zig-cache \
 
 FROM alpine:3.23 AS run
 COPY --from=builder /app/zig-out/bin/link_shortener /app/link_shortener
-COPY --from=builder /app/src/templates /app/src/templates
 RUN adduser --disabled-password --gecos "" noroot && \
     mkdir -p /app/db && \
     chown -R noroot:noroot /app
