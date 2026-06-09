@@ -28,8 +28,7 @@ pub fn main(app: *App, _: *httpz.Request, res: *httpz.Response) !void {
 pub fn getCreateLink(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
     const user_id = try getUserId(app, req);
     if (user_id == 0) {
-        res.status = 303;
-        res.header("Location", "/auth/login");
+        res.header("HX-Redirect", "/auth/login");
         return;
     }
 
@@ -47,8 +46,7 @@ pub fn getCreateLink(app: *App, req: *httpz.Request, res: *httpz.Response) !void
 pub fn postCreateLink(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
     const user_id = try getUserId(app, req);
     if (user_id == 0) {
-        res.status = 303;
-        res.header("Location", "/auth/login");
+        res.header("HX-Redirect", "/auth/login");
         return;
     }
 
@@ -85,7 +83,7 @@ pub fn listLinks(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
     const user_id = try getUserId(app, req);
     if (user_id == 0) {
         res.status = 303;
-        res.header("Location", "/auth/login");
+        res.header("HX-Redirect", "/auth/login");
         return;
     }
 
@@ -107,7 +105,7 @@ pub fn removeLink(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
     const user_id = try getUserId(app, req);
     if (user_id == 0) {
         res.status = 303;
-        res.header("Location", "/auth/login");
+        res.header("HX-Redirect", "/auth/login");
         return;
     }
 
