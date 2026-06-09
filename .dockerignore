@@ -1,0 +1,8 @@
+.gitignore
+README.md
+compose.yml
+Dockerfile
+.air.toml
+tmp
+zig-out
+.zig-cache

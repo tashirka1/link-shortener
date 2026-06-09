@@ -1,0 +1,39 @@
+<div>
+  <div style="width: fit-content;">
+    <form hx-post="/link/create-link" hx-target="#list-links" hx-swap="afterbegin" hx-on::resetCreateForm="this.reset()">
+      <fieldset role="group">
+        <input type="text" name="url" placeholder="URL" aria-label="URL" required/>
+        <button>Create</button>
+      </fieldset>
+    </form>
+    <div style="margin-bottom: 10px">
+      <div id="create-link-errors" style="color:red;"></div>
+    </div>
+  </div>
+  <article style="overflow-y: auto;" id="links">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Short link</th>
+          <th scope="col">URL</th>
+          <th scope="col">Clicks</th>
+          <th scope="col">Delete</th>
+        </tr>
+      </thead>
+      <tbody id="list-links">
+        <% if (@links.len > 0) { %>
+          <% foreach (@links) |link| { %>
+            <tr>
+              <td><a href="/<%= link["code"] %>" class="shortLink" target="_blank"><%= link["code"] %></a></td>
+              <td><a href="<%= link["url"] %>" target="_blank"><%= link["url"] %></a></td>
+              <td><%= link["clicks"] %></td>
+              <td>
+                <button hx-delete="/link/remove-link/<%= link["code"] %>" hx-target="closest tr" hx-swap="outerHTML">Delete</button>
+              </td>
+            </tr>
+          <% } %>
+        <% } %>
+      </tbody>
+    </table>
+  </article>
+</div>

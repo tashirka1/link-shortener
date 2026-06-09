@@ -1,0 +1,5 @@
+<div>
+  <h1>Start here</h1>
+  <a href="/auth/register">Register</a>
+  <a href="/auth/login">Login</a>
+</div>

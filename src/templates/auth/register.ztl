@@ -1,0 +1,11 @@
+<div class="grid">
+  <article style="margin: auto">
+    <h1>Register</h1>
+    <form hx-post="/auth/register">
+      <input type="email" name="email" placeholder="Email" aria-label="email" required/>
+      <input type="password" name="password" placeholder="Password" aria-label="password" required/>
+      <button>Register</button>
+      <div id="errors" style="margin-top:5px;color: red"></div>
+    </form>
+  </article>
+</div>

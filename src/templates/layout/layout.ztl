@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" type="image/x-icon" href="/static/icon/favicon.ico"/>
+  <link rel="icon" href="/static/icon/favicon.svg" type="image/svg+xml"/>
+  <link rel="apple-touch-icon" href="/static/icon/favicon.png"/>
+  <title><%= @title %></title>
+  <link rel="stylesheet" href="/static/css/pico@2.min.css"/>
+  <link rel="stylesheet" href="/static/css/main.css?v=1"/>
+</head>
+<body hx-boost="true" style="padding: 0px 30px">
+  <nav>
+    <ul>
+      <li><a href="/"><strong>Link Shortener</strong></a></li>
+    </ul>
+    <ul>
+      <% if (@user_id != 0) { %>
+        <li><a href="/auth/logout">Logout</a></li>
+      <% } else { %>
+        <li><a href="/auth/register">Register</a></li>
+        <li><a href="/auth/login">Login</a></li>
+      <% } %>
+    </ul>
+  </nav>
+  <main class="container">
+    <section>
+      <%= @content %>
+    </section>
+  </main>
+  <script src="/static/js/htmx.org@2.0.10.min.js"></script>
+  <script src="/static/js/main.js?v=2"></script>
+</body>
+</html>
