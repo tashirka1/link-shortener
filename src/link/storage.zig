@@ -26,14 +26,6 @@ pub fn createLink(conn: *zqlite.Conn, allocator: std.mem.Allocator, url: []const
 
 pub fn listLinks(conn: *zqlite.Conn, allocator: std.mem.Allocator, user_id: i64, cursor: i64) ![]model.Link {
     var list: std.ArrayListAligned(model.Link, null) = .empty;
-    errdefer {
-        for (list.items) |item| {
-            allocator.free(item.code);
-            allocator.free(item.url);
-            allocator.free(item.created_at);
-        }
-        list.deinit(allocator);
-    }
 
     var rows = try conn.rows(
         "SELECT id, code, url, clicks, user_id, created_at FROM link_link WHERE user_id = ? AND id < ? ORDER BY id DESC LIMIT 5",
@@ -42,20 +34,13 @@ pub fn listLinks(conn: *zqlite.Conn, allocator: std.mem.Allocator, user_id: i64,
     defer rows.deinit();
 
     while (rows.next()) |row| {
-        const code = try allocator.dupe(u8, row.text(1));
-        errdefer allocator.free(code);
-        const url = try allocator.dupe(u8, row.text(2));
-        errdefer allocator.free(url);
-        const created_at = try allocator.dupe(u8, row.nullableText(5) orelse "");
-        errdefer allocator.free(created_at);
-
         try list.append(allocator, .{
             .id = row.int(0),
-            .code = code,
-            .url = url,
+            .code = try allocator.dupe(u8, row.text(1)),
+            .url = try allocator.dupe(u8, row.text(2)),
             .clicks = row.int(3),
             .user_id = row.int(4),
-            .created_at = created_at,
+            .created_at = try allocator.dupe(u8, row.nullableText(5) orelse ""),
         });
     }
     return list.toOwnedSlice(allocator);

@@ -8,7 +8,6 @@ pub fn checkEmail(conn: *zqlite.Conn, allocator: std.mem.Allocator, email: []con
 
     if (rows.next()) |row| {
         const user_email = try allocator.dupe(u8, row.text(1));
-        errdefer allocator.free(user_email);
         const user_password = try allocator.dupe(u8, row.text(2));
         return .{
             .id = row.int(0),
