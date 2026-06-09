@@ -8,13 +8,8 @@ pub fn newCode(io: std.Io) ![code_length]u8 {
     var rand_buf: [code_length]u8 = undefined;
     try io.randomSecure(&rand_buf);
 
-    var value: u56 = 0;
-    for (rand_buf) |b| {
-        value = (value << 8) | b;
-    }
-    for (&code) |*c| {
-        c.* = charset[value % charset.len];
-        value /= charset.len;
+    for (&code, rand_buf) |*c, r| {
+        c.* = charset[r % charset.len];
     }
     return code;
 }
