@@ -19,7 +19,7 @@ pub fn init(secret: []const u8) Context {
 
 pub fn encrypt(ctx: *const Context, user_id: i64, io: std.Io) ![encrypted_len]u8 {
     var nonce: [nonce_len]u8 = undefined;
-    io.randomSecure(&nonce) catch {};
+    try io.randomSecure(&nonce);
 
     var ciphertext: [plain_len]u8 = undefined;
     var tag: [tag_len]u8 = undefined;
@@ -48,7 +48,7 @@ pub fn decrypt(ctx: *const Context, data: []const u8) !i64 {
 test "encrypt/decrypt round trip" {
     const ctx = init("test_key_12345");
     const user_id: i64 = 42;
-    const io = std.Io.failing;
+    const io = std.testing.io;
 
     const encrypted = try encrypt(&ctx, user_id, io);
     const decrypted = try decrypt(&ctx, encrypted[0..]);
@@ -65,7 +65,7 @@ test "decrypt with wrong key" {
     const ctx1 = init("key1");
     const ctx2 = init("key2");
     const user_id: i64 = 99;
-    const io = std.Io.failing;
+    const io = std.testing.io;
 
     const encrypted = try encrypt(&ctx1, user_id, io);
     try std.testing.expectError(error.AuthenticationFailed, decrypt(&ctx2, encrypted[0..]));

@@ -7,10 +7,13 @@ pub fn checkEmail(conn: *zqlite.Conn, allocator: std.mem.Allocator, email: []con
     defer rows.deinit();
 
     if (rows.next()) |row| {
+        const user_email = try allocator.dupe(u8, row.text(1));
+        errdefer allocator.free(user_email);
+        const user_password = try allocator.dupe(u8, row.text(2));
         return .{
             .id = row.int(0),
-            .email = try allocator.dupe(u8, row.text(1)),
-            .password = try allocator.dupe(u8, row.text(2)),
+            .email = user_email,
+            .password = user_password,
         };
     }
     return model.UserError.UserNotFound;

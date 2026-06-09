@@ -44,10 +44,10 @@ pub const App = struct {
         try self.template.error_tpl.compile(@embedFile("../templates/error.ztl"), .{});
     }
 
-    pub fn partial(self: *App, allocator: std.mem.Allocator, template_key: []const u8, include_key: []const u8) !?ztl.PartialResult {
-        _ = self;
-        _ = allocator;
-        _ = template_key;
+    pub fn partial(_self: *App, _allocator: std.mem.Allocator, _template_key: []const u8, include_key: []const u8) !?ztl.PartialResult {
+        _ = _self;
+        _ = _allocator;
+        _ = _template_key;
         if (std.mem.eql(u8, include_key, "header")) {
             return .{ .src = @embedFile("../templates/layout/header.ztl") };
         }

@@ -109,6 +109,7 @@ pub fn main(init: std.process.Init) !void {
 
     // server
     server_instance = &server;
+    errdefer server_instance = null;
     try server.listen();
 }
 

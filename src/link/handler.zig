@@ -3,22 +3,21 @@ const httpz = @import("httpz");
 const model = @import("model.zig");
 const service = @import("service.zig");
 const session = @import("../core/session.zig");
+const user_core = @import("../core/user.zig");
 const App = @import("../core/app.zig").App;
-
-fn getUserId(app: *App, req: *httpz.Request) !i64 {
-    const cookie = req.cookies().get("session") orelse return 0;
-    if (cookie.len == 0) return 0;
-    var buf: [session.encrypted_len]u8 = undefined;
-    std.base64.url_safe_no_pad.Decoder.decode(&buf, cookie) catch return 0;
-    return session.decrypt(&app.session, buf[0..]) catch 0;
-}
 
 fn renderLayout(app: *App, res: *httpz.Response, title: []const u8, user_id: i64, content: []const u8) !void {
     res.content_type = .HTML;
     try app.template.layout.render(res.writer(), .{ .title = title, .user_id = user_id, .content = content }, .{ .allocator = res.arena });
 }
 
-pub fn main(app: *App, _: *httpz.Request, res: *httpz.Response) !void {
+pub fn main(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
+    const user_id = user_core.getUserId(app, req);
+    if (user_id > 0) {
+        res.status = 200;
+        res.header("HX-Redirect", "/link/create-link");
+        return;
+    }
     var buf = std.Io.Writer.Allocating.init(res.arena);
     defer buf.deinit();
     try app.template.main.render(&buf.writer, .{}, .{ .allocator = res.arena });
@@ -26,7 +25,7 @@ pub fn main(app: *App, _: *httpz.Request, res: *httpz.Response) !void {
 }
 
 pub fn getCreateLink(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
-    const user_id = try getUserId(app, req);
+    const user_id = user_core.getUserId(app, req);
     if (user_id == 0) {
         res.header("HX-Redirect", "/auth/login");
         return;
@@ -44,7 +43,7 @@ pub fn getCreateLink(app: *App, req: *httpz.Request, res: *httpz.Response) !void
 }
 
 pub fn postCreateLink(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
-    const user_id = try getUserId(app, req);
+    const user_id = user_core.getUserId(app, req);
     if (user_id == 0) {
         res.header("HX-Redirect", "/auth/login");
         return;
@@ -80,7 +79,7 @@ pub fn postCreateLink(app: *App, req: *httpz.Request, res: *httpz.Response) !voi
 }
 
 pub fn listLinks(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
-    const user_id = try getUserId(app, req);
+    const user_id = user_core.getUserId(app, req);
     if (user_id == 0) {
         res.status = 303;
         res.header("HX-Redirect", "/auth/login");
@@ -102,7 +101,7 @@ pub fn listLinks(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
 }
 
 pub fn removeLink(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
-    const user_id = try getUserId(app, req);
+    const user_id = user_core.getUserId(app, req);
     if (user_id == 0) {
         res.status = 303;
         res.header("HX-Redirect", "/auth/login");
@@ -117,9 +116,9 @@ pub fn removeLink(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
     var conn = try app.db_pool.acquire(app.io);
     defer app.db_pool.release(app.io, conn);
 
-    service.removeLink(&conn, user_id, code) catch {
-        std.log.err("remove link failed", .{});
-        res.status = 200;
+    service.removeLink(&conn, user_id, code) catch |err| {
+        std.log.err("remove link failed: {s}", .{@errorName(err)});
+        res.status = 500;
         return;
     };
     res.status = 200;
@@ -147,7 +146,9 @@ pub fn redirectLink(app: *App, req: *httpz.Request, res: *httpz.Response) !void 
         },
     };
 
-    service.clickLink(&conn, code) catch {};
+    service.clickLink(&conn, code) catch |err| {
+        std.log.err("click link failed: {s}", .{@errorName(err)});
+    };
     res.status = 303;
     res.header("Location", url);
 }
