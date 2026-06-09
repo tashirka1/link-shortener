@@ -8,7 +8,7 @@ pub fn createLink(conn: *zqlite.Conn, allocator: std.mem.Allocator, url: []const
 
     try conn.exec("INSERT INTO link_link(code, url, clicks, user_id) VALUES (?, ?, 0, ?) ON CONFLICT(user_id, url) DO NOTHING", .{ &code, url, user_id });
 
-    var rows = try conn.rows("SELECT id, code, url, clicks, user_id, created_at FROM link_link WHERE user_id = ? AND url = ?", .{ user_id, url });
+    var rows = try conn.rows("SELECT id, code, url, clicks, user_id, created_at FROM link_link WHERE user_id = ? AND code = ?", .{ user_id, &code });
     defer rows.deinit();
 
     if (rows.next()) |row| {
