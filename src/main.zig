@@ -7,6 +7,12 @@ const link_handler = @import("link/handler.zig");
 const auth_handler = @import("auth/handler.zig");
 const App = @import("core/app.zig").App;
 
+// zig build test
+comptime {
+    _ = session;
+    _ = @import("core/base62.zig");
+}
+
 var server_instance: ?*httpz.Server(*App) = null;
 
 pub fn main(init: std.process.Init) !void {
