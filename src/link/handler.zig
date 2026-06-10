@@ -11,13 +11,7 @@ fn renderLayout(app: *App, res: *httpz.Response, title: []const u8, user_id: i64
     try app.template.layout.render(res.writer(), .{ .title = title, .user_id = user_id, .content = content }, .{ .allocator = res.arena });
 }
 
-pub fn main(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
-    const user_id = user_core.getUserId(app, req);
-    if (user_id > 0) {
-        res.status = 200;
-        res.header("HX-Redirect", "/link/create-link");
-        return;
-    }
+pub fn main(app: *App, _: *httpz.Request, res: *httpz.Response) !void {
     var buf = std.Io.Writer.Allocating.init(res.arena);
     defer buf.deinit();
     try app.template.main.render(&buf.writer, .{}, .{ .allocator = res.arena });
