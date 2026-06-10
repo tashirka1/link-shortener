@@ -170,4 +170,5 @@ fn renderLinkRow(res: *httpz.Response, link: model.Link) !void {
     try std.Io.Writer.print(w, "<td>{d}</td>", .{link.clicks});
     try std.Io.Writer.print(w, "<td><button hx-delete=\"/link/remove-link/{s}\" hx-target=\"closest tr\" hx-swap=\"outerHTML\">Delete</button></td>", .{link.code});
     try std.Io.Writer.writeAll(w, "</tr>");
+    try std.Io.Writer.writeAll(w, "<div id=\"create-link-errors\" hx-swap-oob=\"true\"></div>");
 }
