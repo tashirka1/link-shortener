@@ -1,9 +1,11 @@
-<article>
-    <header><strong>Login</strong></header>
-    <form hx-post="/auth/login">
-        <input type="email" name="email" placeholder="Email" aria-label="email" required/>
-        <input type="password" name="password" placeholder="Password" aria-label="password" required/>
-        <button>Login</button>
-        <div id="errors" style="margin-top:5px;color: red"></div>
-    </form>
-</article>
+<div class="grid">
+    <article style="margin: auto">
+        <header><strong>Login</strong></header>
+        <form hx-post="/auth/login">
+            <input type="email" name="email" placeholder="Email" aria-label="email" required/>
+            <input type="password" name="password" placeholder="Password" aria-label="password" required/>
+            <button>Login</button>
+            <div id="errors" style="margin-top:5px;color: red"></div>
+        </form>
+    </article>
+</div>
