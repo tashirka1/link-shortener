@@ -1,0 +1,5 @@
+<article>
+  <header><strong>Unauthorized</strong></header>
+  <p>You need to <a href="/auth/login">login</a> to access this page.</p>
+  <p>Don't have an account? <a href="/auth/register">Register</a></p>
+</article>

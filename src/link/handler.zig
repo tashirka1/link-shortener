@@ -6,6 +6,13 @@ const session = @import("../core/session.zig");
 const user_core = @import("../core/user.zig");
 const App = @import("../core/app.zig").App;
 
+pub fn unauthorized(app: *App, _: *httpz.Request, res: *httpz.Response) !void {
+    var buf = std.Io.Writer.Allocating.init(res.arena);
+    defer buf.deinit();
+    try app.template.unauthorized.render(&buf.writer, .{}, .{ .allocator = res.arena });
+    try renderLayout(app, res, "Unauthorized", 0, buf.written());
+}
+
 fn renderLayout(app: *App, res: *httpz.Response, title: []const u8, user_id: i64, content: []const u8) !void {
     res.content_type = .HTML;
     try app.template.layout.render(res.writer(), .{ .title = title, .user_id = user_id, .content = content }, .{ .allocator = res.arena });
@@ -22,6 +29,7 @@ pub fn getCreateLink(app: *App, req: *httpz.Request, res: *httpz.Response) !void
     const user_id = user_core.getUserId(app, req);
     if (user_id == 0) {
         res.header("HX-Redirect", "/auth/login");
+        try unauthorized(app, req, res);
         return;
     }
 
@@ -40,6 +48,7 @@ pub fn postCreateLink(app: *App, req: *httpz.Request, res: *httpz.Response) !voi
     const user_id = user_core.getUserId(app, req);
     if (user_id == 0) {
         res.header("HX-Redirect", "/auth/login");
+        try unauthorized(app, req, res);
         return;
     }
 
@@ -75,8 +84,8 @@ pub fn postCreateLink(app: *App, req: *httpz.Request, res: *httpz.Response) !voi
 pub fn listLinks(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
     const user_id = user_core.getUserId(app, req);
     if (user_id == 0) {
-        res.status = 303;
         res.header("HX-Redirect", "/auth/login");
+        try unauthorized(app, req, res);
         return;
     }
 
@@ -97,8 +106,8 @@ pub fn listLinks(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
 pub fn removeLink(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
     const user_id = user_core.getUserId(app, req);
     if (user_id == 0) {
-        res.status = 303;
         res.header("HX-Redirect", "/auth/login");
+        try unauthorized(app, req, res);
         return;
     }
 

@@ -50,6 +50,7 @@ pub fn main(init: std.process.Init) !void {
             .link = undefined,
             .link_row = undefined,
             .error_tpl = undefined,
+            .unauthorized = undefined,
         },
         .session = session_ctx,
     };
@@ -63,6 +64,7 @@ pub fn main(init: std.process.Init) !void {
         app.template.link.deinit();
         app.template.link_row.deinit();
         app.template.error_tpl.deinit();
+        app.template.unauthorized.deinit();
     }
 
     // shutdown
