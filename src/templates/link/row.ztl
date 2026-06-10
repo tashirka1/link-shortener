@@ -1,6 +1,6 @@
 <tr>
   <td><a href="/<%= @code %>" class="shortLink" target="_blank"><%= @code %></a></td>
-  <td><a href="<%= @url %>" target="_blank"><%= @url %></a></td>
+  <td><a href="<%= escape @url %>" target="_blank"><%= escape @url %></a></td>
   <td><%= @clicks %></td>
   <td><button hx-delete="/link/remove-link/<%= @code %>" hx-target="closest tr" hx-swap="outerHTML">Delete</button></td>
 </tr>

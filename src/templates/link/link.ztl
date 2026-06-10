@@ -25,7 +25,7 @@
           <% foreach (@links) |link| { %>
             <tr>
               <td><a href="/<%= link["code"] %>" class="shortLink" target="_blank"><%= link["code"] %></a></td>
-              <td><a href="<%= link["url"] %>" target="_blank"><%= link["url"] %></a></td>
+              <td><a href="<%= escape link["url"] %>" target="_blank"><%= escape link["url"] %></a></td>
               <td><%= link["clicks"] %></td>
               <td>
                 <button hx-delete="/link/remove-link/<%= link["code"] %>" hx-target="closest tr" hx-swap="outerHTML">Delete</button>
