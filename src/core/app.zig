@@ -9,6 +9,7 @@ pub const Templates = struct {
     login: ztl.Template(void),
     register: ztl.Template(void),
     link: ztl.Template(void),
+    link_row: ztl.Template(void),
     error_tpl: ztl.Template(void),
 };
 
@@ -38,6 +39,10 @@ pub const App = struct {
         self.template.link = ztl.Template(void).init(allocator, {});
         errdefer self.template.link.deinit();
         try self.template.link.compile(@embedFile("../templates/link/link.ztl"), .{});
+
+        self.template.link_row = ztl.Template(void).init(allocator, {});
+        errdefer self.template.link_row.deinit();
+        try self.template.link_row.compile(@embedFile("../templates/link/row.ztl"), .{});
 
         self.template.error_tpl = ztl.Template(void).init(allocator, {});
         errdefer self.template.error_tpl.deinit();

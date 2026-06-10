@@ -75,7 +75,7 @@ pub fn postCreateLink(app: *App, req: *httpz.Request, res: *httpz.Response) !voi
         };
     };
 
-    try renderLinkRow(res, link);
+    try renderLinkRow(app, res, link);
 }
 
 pub fn listLinks(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
@@ -96,7 +96,7 @@ pub fn listLinks(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
     const links = try service.listLinks(&conn, res.arena, user_id, cursor);
 
     for (links) |link| {
-        try renderLinkRow(res, link);
+        try renderLinkRow(app, res, link);
     }
 }
 
@@ -161,14 +161,11 @@ fn renderCreateLinkError(app: *App, res: *httpz.Response, msg: []const u8) !void
     try app.template.error_tpl.render(res.writer(), .{ .message = msg }, .{ .allocator = res.arena });
 }
 
-fn renderLinkRow(res: *httpz.Response, link: model.Link) !void {
+fn renderLinkRow(app: *App, res: *httpz.Response, link: model.Link) !void {
     res.content_type = .HTML;
-    const w = res.writer();
-    try std.Io.Writer.writeAll(w, "<tr>");
-    try std.Io.Writer.print(w, "<td><a href=\"/{s}\" class=\"shortLink\" target=\"_blank\">{s}</a></td>", .{ link.code, link.code });
-    try std.Io.Writer.print(w, "<td><a href=\"{s}\" target=\"_blank\">{s}</a></td>", .{ link.url, link.url });
-    try std.Io.Writer.print(w, "<td>{d}</td>", .{link.clicks});
-    try std.Io.Writer.print(w, "<td><button hx-delete=\"/link/remove-link/{s}\" hx-target=\"closest tr\" hx-swap=\"outerHTML\">Delete</button></td>", .{link.code});
-    try std.Io.Writer.writeAll(w, "</tr>");
-    try std.Io.Writer.writeAll(w, "<div id=\"create-link-errors\" hx-swap-oob=\"true\"></div>");
+    try app.template.link_row.render(res.writer(), .{
+        .code = link.code,
+        .url = link.url,
+        .clicks = link.clicks,
+    }, .{ .allocator = res.arena });
 }

@@ -48,6 +48,7 @@ pub fn main(init: std.process.Init) !void {
             .login = undefined,
             .register = undefined,
             .link = undefined,
+            .link_row = undefined,
             .error_tpl = undefined,
         },
         .session = session_ctx,
@@ -60,6 +61,7 @@ pub fn main(init: std.process.Init) !void {
         app.template.login.deinit();
         app.template.register.deinit();
         app.template.link.deinit();
+        app.template.link_row.deinit();
         app.template.error_tpl.deinit();
     }
 
