@@ -12,12 +12,12 @@
   <tbody>
     <% foreach (@rows) |row| { %>
       <tr>
-        <td><%= @row["id"] %></td>
-        <td><%= @row["payload"] %></td>
-        <td><%= @row["ts"] %></td>
-        <td><%= @row["duration"] %></td>
-        <td><%= @row["meta_key"] %></td>
-        <td><%= @row["meta_value"] %></td>
+        <td><%= row["id"] %></td>
+        <td><%= row["payload"] %></td>
+        <td><%= row["ts"] %></td>
+        <td><%= row["duration"] %></td>
+        <td><%= row["meta_key"] %></td>
+        <td><%= row["meta_value"] %></td>
       </tr>
     <% } %>
   </tbody>
