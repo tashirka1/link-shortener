@@ -16,24 +16,29 @@ pub fn simpleZtlPage(app: *App, _: *httpz.Request, res: *httpz.Response) !void {
     try app.template.rps_simple.render(res.writer(), .{}, .{ .allocator = res.arena });
 }
 
-pub fn ztlPageSelectJoin(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
+fn parseLimit(req: *httpz.Request) !usize {
     const q = try req.query();
     const limit_str = q.get("limit") orelse "10";
-    const limit = std.fmt.parseInt(usize, limit_str, 10) catch 10;
+    return std.fmt.parseInt(usize, limit_str, 10) catch 10;
+}
+
+fn renderJoin(app: *App, res: *httpz.Response, rows: []const storage.JoinRow) !void {
+    res.content_type = .HTML;
+    try app.template.rps_select_join.render(res.writer(), .{ .rows = rows }, .{ .allocator = res.arena });
+}
+
+pub fn ztlPageSelectJoin(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
+    const limit = try parseLimit(req);
 
     var conn = try app.db_pool.acquire(app.io);
     defer app.db_pool.release(app.io, conn);
 
     const rows = try storage.selectJoin(&conn, res.arena, limit);
-
-    res.content_type = .HTML;
-    try app.template.rps_select_join.render(res.writer(), .{ .rows = rows }, .{ .allocator = res.arena });
+    try renderJoin(app, res, rows);
 }
 
 pub fn ztlPageSelectJoinUpdate(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
-    const q = try req.query();
-    const limit_str = q.get("limit") orelse "10";
-    const limit = std.fmt.parseInt(usize, limit_str, 10) catch 10;
+    const limit = try parseLimit(req);
 
     var conn = try app.db_pool.acquire(app.io);
     defer app.db_pool.release(app.io, conn);
@@ -41,14 +46,11 @@ pub fn ztlPageSelectJoinUpdate(app: *App, req: *httpz.Request, res: *httpz.Respo
     const rows = try storage.selectJoin(&conn, res.arena, limit);
 
     var ids = try std.ArrayList(i64).initCapacity(res.arena, rows.len);
-    for (rows) |row| {
-        ids.appendAssumeCapacity(row.id);
-    }
+    for (rows) |row| ids.appendAssumeCapacity(row.id);
     try storage.updateDurations(&conn, ids.items);
-    const updated_rows = try storage.selectJoin(&conn, res.arena, limit);
 
-    res.content_type = .HTML;
-    try app.template.rps_select_join.render(res.writer(), .{ .rows = updated_rows }, .{ .allocator = res.arena });
+    const updated_rows = try storage.selectJoin(&conn, res.arena, limit);
+    try renderJoin(app, res, updated_rows);
 }
 
 pub fn ztlPageInsert(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
