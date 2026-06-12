@@ -78,6 +78,7 @@ pub fn postCreateLink(app: *App, req: *httpz.Request, res: *httpz.Response) !voi
         };
     };
 
+    res.header("HX-Trigger", "reset-create-form");
     try renderLinkRow(app, res, link);
 }
 
