@@ -77,7 +77,7 @@ pub fn postRegister(app: *App, req: *httpz.Request, res: *httpz.Response) !void 
 
     service.createUser(&conn, res.arena, email, password, app.io) catch |err| {
         return switch (err) {
-            error.UserAlreadyExists => renderAuthError(app, res, "the email is already in use"),
+            error.ConstraintUnique => renderAuthError(app, res, "the email is already in use"),
             else => {
                 std.log.err("register failed: {s}", .{@errorName(err)});
                 return renderAuthError(app, res, "internal error");
