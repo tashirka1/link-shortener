@@ -52,6 +52,7 @@ pub fn main(init: std.process.Init) !void {
             .link_row = undefined,
             .error_tpl = undefined,
             .unauthorized = undefined,
+            .rps_simple = undefined,
         },
         .session = session_ctx,
     };
@@ -66,6 +67,7 @@ pub fn main(init: std.process.Init) !void {
         app.template.link_row.deinit();
         app.template.error_tpl.deinit();
         app.template.unauthorized.deinit();
+        app.template.rps_simple.deinit();
     }
 
     // shutdown
@@ -117,6 +119,8 @@ pub fn main(init: std.process.Init) !void {
 
     // rps benchmark routes
     router.get("/rps/simple-text", rps.simpleText, .{});
+    router.get("/rps/simple-json", rps.simpleJson, .{});
+    router.get("/rps/simple-ztl-page", rps.simpleZtlPage, .{});
 
     // redirect catch-all (must be last)
     router.get("/:code", link_handler.redirectLink, .{});

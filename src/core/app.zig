@@ -12,6 +12,7 @@ pub const Templates = struct {
     link_row: ztl.Template(void),
     error_tpl: ztl.Template(void),
     unauthorized: ztl.Template(void),
+    rps_simple: ztl.Template(void),
 };
 
 pub const App = struct {
@@ -52,6 +53,10 @@ pub const App = struct {
         self.template.unauthorized = ztl.Template(void).init(allocator, {});
         errdefer self.template.unauthorized.deinit();
         try self.template.unauthorized.compile(@embedFile("../templates/unauthorized.ztl"), .{});
+
+        self.template.rps_simple = ztl.Template(void).init(allocator, {});
+        errdefer self.template.rps_simple.deinit();
+        try self.template.rps_simple.compile(@embedFile("../rps/templates/rps_simple.ztl"), .{});
     }
 
     pub fn partial(_self: *App, _allocator: std.mem.Allocator, _template_key: []const u8, include_key: []const u8) !?ztl.PartialResult {
