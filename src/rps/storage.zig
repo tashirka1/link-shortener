@@ -18,15 +18,12 @@ pub fn insert(conn: *zqlite.Conn, payload: []const u8, ts: i64, duration: i64) !
 }
 
 pub fn selectJoin(conn: *zqlite.Conn, allocator: std.mem.Allocator, limit: usize) ![]JoinRow {
-    var list = std.ArrayListAligned(JoinRow, null).empty;
+    var list: std.ArrayListAligned(JoinRow, null) = .empty;
 
     var rows = try conn.rows(
-        \\SELECT rps_log.id, rps_log.payload, rps_log.ts, rps_log.duration, rps_meta.key, rps_meta.value
-        \\FROM rps_log
-        \\LEFT JOIN rps_meta ON rps_log.id = rps_meta.log_id
-        \\ORDER BY rps_log.id DESC
-        \\LIMIT ?
-    , .{@as(i64, @intCast(limit))});
+        "SELECT rps_log.id, rps_log.payload, rps_log.ts, rps_log.duration, rps_meta.key, rps_meta.value FROM rps_log LEFT JOIN rps_meta ON rps_log.id = rps_meta.log_id ORDER BY rps_log.id DESC LIMIT ?",
+        .{@as(i64, @intCast(limit))},
+    );
     defer rows.deinit();
 
     while (rows.next()) |row| {
