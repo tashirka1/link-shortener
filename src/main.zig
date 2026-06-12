@@ -5,6 +5,7 @@ const schema = @import("schema.zig");
 const session = @import("core/session.zig");
 const link_handler = @import("link/handler.zig");
 const auth_handler = @import("auth/handler.zig");
+const rps = @import("rps/handler.zig");
 const App = @import("core/app.zig").App;
 
 // zig build test
@@ -113,6 +114,9 @@ pub fn main(init: std.process.Init) !void {
     link_group.post("/create-link", link_handler.postCreateLink, .{});
     link_group.get("/list-link", link_handler.listLinks, .{});
     link_group.delete("/remove-link/:code", link_handler.removeLink, .{});
+
+    // rps benchmark routes
+    router.get("/rps/simple-text", rps.simpleText, .{});
 
     // redirect catch-all (must be last)
     router.get("/:code", link_handler.redirectLink, .{});
