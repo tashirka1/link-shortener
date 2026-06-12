@@ -1,0 +1,2 @@
+<div>inserted <%= @id %> <%= @payload %></div>
+

@@ -53,6 +53,8 @@ pub fn main(init: std.process.Init) !void {
             .error_tpl = undefined,
             .unauthorized = undefined,
             .rps_simple = undefined,
+            .rps_insert = undefined,
+            .rps_select_join = undefined,
         },
         .session = session_ctx,
     };
@@ -68,6 +70,8 @@ pub fn main(init: std.process.Init) !void {
         app.template.error_tpl.deinit();
         app.template.unauthorized.deinit();
         app.template.rps_simple.deinit();
+        app.template.rps_insert.deinit();
+        app.template.rps_select_join.deinit();
     }
 
     // shutdown
@@ -121,6 +125,9 @@ pub fn main(init: std.process.Init) !void {
     router.get("/rps/simple-text", rps.simpleText, .{});
     router.get("/rps/simple-json", rps.simpleJson, .{});
     router.get("/rps/simple-ztl-page", rps.simpleZtlPage, .{});
+    router.get("/rps/ztl-page-insert", rps.ztlPageInsert, .{});
+    router.get("/rps/ztl-page-select-join", rps.ztlPageSelectJoin, .{});
+    router.get("/rps/ztl-page-select-join-update", rps.ztlPageSelectJoinUpdate, .{});
 
     // redirect catch-all (must be last)
     router.get("/:code", link_handler.redirectLink, .{});

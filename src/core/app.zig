@@ -13,6 +13,8 @@ pub const Templates = struct {
     error_tpl: ztl.Template(void),
     unauthorized: ztl.Template(void),
     rps_simple: ztl.Template(void),
+    rps_insert: ztl.Template(void),
+    rps_select_join: ztl.Template(void),
 };
 
 pub const App = struct {
@@ -57,6 +59,14 @@ pub const App = struct {
         self.template.rps_simple = ztl.Template(void).init(allocator, {});
         errdefer self.template.rps_simple.deinit();
         try self.template.rps_simple.compile(@embedFile("../rps/templates/rps_simple.ztl"), .{});
+
+        self.template.rps_insert = ztl.Template(void).init(allocator, {});
+        errdefer self.template.rps_insert.deinit();
+        try self.template.rps_insert.compile(@embedFile("../rps/templates/rps_insert.ztl"), .{});
+
+        self.template.rps_select_join = ztl.Template(void).init(allocator, {});
+        errdefer self.template.rps_select_join.deinit();
+        try self.template.rps_select_join.compile(@embedFile("../rps/templates/rps_select_join.ztl"), .{});
     }
 
     pub fn partial(_self: *App, _allocator: std.mem.Allocator, _template_key: []const u8, include_key: []const u8) !?ztl.PartialResult {
