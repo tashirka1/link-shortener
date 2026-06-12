@@ -32,10 +32,10 @@ wrk -t10 -c100 -d5s 'http://localhost:8000/rps/ztl-page-insert?payload=bench'
 
 **ztl-page-select-join** (requires pre-populated data):
 ```
-wrk -t10 -c100 -d5s 'http://localhost:8000/rps/ztl-page-select-join?limit=100'
+wrk -t10 -c100 -d5s 'http://localhost:8000/rps/ztl-page-select-join?limit=15'
 ```
 
 **ztl-page-select-join-update:**
 ```
-wrk -t10 -c100 -d5s 'http://localhost:8000/rps/ztl-page-select-join-update?limit=100'
+wrk -t10 -c100 -d5s 'http://localhost:8000/rps/ztl-page-select-join-update?limit=15'
 ```
