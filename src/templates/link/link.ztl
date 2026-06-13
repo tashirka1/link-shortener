@@ -30,7 +30,11 @@
       <tbody id="list-links">
         <% if (@links.len > 0) { %>
           <% foreach (@links) |link| { %>
-            <tr>
+            <% if (link["id"] == @last_id) { %>
+              <tr hx-get="/link/list-link?cursor=<%= link["id"] %>" hx-trigger="revealed" hx-swap="afterend">
+            <% } else { %>
+              <tr>
+            <% } %>
               <td><a href="/<%= link["code"] %>" class="shortLink" target="_blank"><%= link["code"] %></a></td>
               <td><a href="<%= escape link["url"] %>" target="_blank"><%= escape link["url"] %></a></td>
               <td><%= link["clicks"] %></td>

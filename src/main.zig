@@ -51,6 +51,7 @@ pub fn main(init: std.process.Init) !void {
             .register = undefined,
             .link = undefined,
             .link_row = undefined,
+            .link_row_list = undefined,
             .error_tpl = undefined,
             .unauthorized = undefined,
             .rps_simple = undefined,
@@ -68,6 +69,7 @@ pub fn main(init: std.process.Init) !void {
         app.template.register.deinit();
         app.template.link.deinit();
         app.template.link_row.deinit();
+        app.template.link_row_list.deinit();
         app.template.error_tpl.deinit();
         app.template.unauthorized.deinit();
         app.template.rps_simple.deinit();

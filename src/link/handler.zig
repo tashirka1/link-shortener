@@ -37,10 +37,11 @@ pub fn getCreateLink(app: *App, req: *httpz.Request, res: *httpz.Response) !void
     defer app.db_pool.release(app.io, conn);
 
     const links = try service.listLinks(&conn, res.arena, user_id, 0);
+    const last_id = if (links.len > 0) links[links.len - 1].id else 0;
 
     var buf = std.Io.Writer.Allocating.init(res.arena);
     defer buf.deinit();
-    try app.template.link.render(&buf.writer, .{ .user_id = user_id, .links = links }, .{ .allocator = res.arena });
+    try app.template.link.render(&buf.writer, .{ .user_id = user_id, .links = links, .last_id = last_id }, .{ .allocator = res.arena });
     try renderLayout(app, res, "Create Link", user_id, buf.written());
 }
 
@@ -98,10 +99,10 @@ pub fn listLinks(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
     defer app.db_pool.release(app.io, conn);
 
     const links = try service.listLinks(&conn, res.arena, user_id, cursor);
+    const last_id = if (links.len > 0) links[links.len - 1].id else 0;
 
-    for (links) |link| {
-        try renderLinkRow(app, res, link);
-    }
+    res.content_type = .HTML;
+    try app.template.link_row_list.render(res.writer(), .{ .links = links, .last_id = last_id }, .{ .allocator = res.arena });
 }
 
 pub fn removeLink(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
