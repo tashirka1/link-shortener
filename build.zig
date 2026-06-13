@@ -122,9 +122,11 @@ pub fn build(b: *std.Build) void {
     exe.root_module.addImport("ztl", ztl.module("ztl"));
 
     // zqlite
+    const sqlite3_flags: []const []const u8 = &.{ "-std=c99", "-DSQLITE_ENABLE_FTS5" };
     const zqlite = b.dependency("zqlite", .{
         .target = target,
         .optimize = optimize,
+        .sqlite3 = sqlite3_flags,
     });
     exe.root_module.addImport("zqlite", zqlite.module("zqlite"));
 }

@@ -39,3 +39,28 @@ const create_tables =
 pub fn run(conn: zqlite.Conn) !void {
     try conn.execNoArgs(create_tables);
 }
+
+pub fn seedFts(conn: zqlite.Conn) !void {
+    try conn.execNoArgs(
+        \\CREATE VIRTUAL TABLE IF NOT EXISTS link_fts USING fts5(
+        \\    code, url,
+        \\    tokenize='unicode61'
+        \\);
+        \\
+        \\CREATE TRIGGER IF NOT EXISTS link_ai AFTER INSERT ON link_link BEGIN
+        \\    INSERT INTO link_fts(rowid, code, url) VALUES (new.id, new.code, new.url);
+        \\END;
+        \\
+        \\CREATE TRIGGER IF NOT EXISTS link_ad AFTER DELETE ON link_link BEGIN
+        \\    INSERT INTO link_fts(link_fts, rowid, code, url) VALUES('delete', old.id, old.code, old.url);
+        \\END;
+        \\
+        \\CREATE TRIGGER IF NOT EXISTS link_au AFTER UPDATE ON link_link BEGIN
+        \\    INSERT INTO link_fts(link_fts, rowid, code, url) VALUES('delete', old.id, old.code, old.url);
+        \\    INSERT INTO link_fts(rowid, code, url) VALUES (new.id, new.code, new.url);
+        \\END;
+        \\
+        \\DELETE FROM link_fts;
+        \\INSERT INTO link_fts(rowid, code, url) SELECT id, code, url FROM link_link;
+    );
+}

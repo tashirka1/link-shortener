@@ -23,3 +23,7 @@ pub fn getLink(conn: *zqlite.Conn, allocator: std.mem.Allocator, code: []const u
 pub fn clickLink(conn: *zqlite.Conn, code: []const u8) !void {
     return storage.clickLink(conn, code);
 }
+
+pub fn searchLinks(conn: *zqlite.Conn, allocator: std.mem.Allocator, user_id: i64, query: []const u8) ![]model.Link {
+    return storage.searchLinks(conn, allocator, user_id, query);
+}

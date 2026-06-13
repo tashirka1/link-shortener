@@ -63,3 +63,45 @@ pub fn getLink(conn: *zqlite.Conn, allocator: std.mem.Allocator, code: []const u
 pub fn clickLink(conn: *zqlite.Conn, code: []const u8) !void {
     try conn.exec("UPDATE link_link SET clicks = clicks + 1 WHERE code = ?", .{code});
 }
+
+fn ftsQuery(query: []const u8, allocator: std.mem.Allocator) ![]const u8 {
+    var parts: std.ArrayList(u8) = .empty;
+    var it = std.mem.tokenizeScalar(u8, query, ' ');
+    var first = true;
+    while (it.next()) |token| {
+        if (!first) try parts.append(allocator, ' ');
+        first = false;
+        try parts.appendSlice(allocator, token);
+        try parts.append(allocator, '*');
+    }
+    return try parts.toOwnedSlice(allocator);
+}
+
+pub fn searchLinks(conn: *zqlite.Conn, allocator: std.mem.Allocator, user_id: i64, query: []const u8) ![]model.Link {
+    var list: std.ArrayListAligned(model.Link, null) = .empty;
+
+    const fts_q = try ftsQuery(query, allocator);
+    defer allocator.free(fts_q);
+
+    var rows = try conn.rows(
+        \\SELECT l.id, l.code, l.url, l.clicks, l.user_id, l.created_at
+        \\FROM link_link l
+        \\JOIN link_fts f ON l.id = f.rowid
+        \\WHERE l.user_id = ? AND link_fts MATCH ?
+        \\ORDER BY bm25(link_fts)
+        \\LIMIT 20
+    , .{ user_id, fts_q });
+    defer rows.deinit();
+
+    while (rows.next()) |row| {
+        try list.append(allocator, .{
+            .id = row.int(0),
+            .code = try allocator.dupe(u8, row.text(1)),
+            .url = try allocator.dupe(u8, row.text(2)),
+            .clicks = row.int(3),
+            .user_id = row.int(4),
+            .created_at = try allocator.dupe(u8, row.nullableText(5) orelse ""),
+        });
+    }
+    return list.toOwnedSlice(allocator);
+}

@@ -10,6 +10,13 @@
       <div id="create-link-errors" style="color:red;"></div>
     </div>
   </div>
+  <div style="margin-bottom: 10px;">
+    <input type="search" name="q" placeholder="Search links..."
+      hx-get="/link/search-link"
+      hx-trigger="keyup delay:300ms, search"
+      hx-target="#list-links"
+      aria-label="Search links"/>
+  </div>
   <article style="overflow-y: auto;" id="links">
     <table>
       <thead>

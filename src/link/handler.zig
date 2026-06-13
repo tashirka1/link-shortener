@@ -128,6 +128,35 @@ pub fn removeLink(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
     res.status = 200;
 }
 
+pub fn searchLinks(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
+    const user_id = user_core.getUserId(app, req);
+    if (user_id == 0) {
+        res.header("HX-Redirect", "/auth/login");
+        try unauthorized(app, req, res);
+        return;
+    }
+
+    const q = try req.query();
+    const query = q.get("q") orelse "";
+
+    var conn = try app.db_pool.acquire(app.io);
+    defer app.db_pool.release(app.io, conn);
+
+    const links = if (query.len == 0)
+        try service.listLinks(&conn, res.arena, user_id, 0)
+    else
+        try service.searchLinks(&conn, res.arena, user_id, query);
+
+    if (links.len == 0) {
+        try res.writer().writeAll("<tr><td colspan=\"4\" style=\"text-align:center;\">No results found</td></tr>");
+        return;
+    }
+
+    for (links) |link| {
+        try renderLinkRow(app, res, link);
+    }
+}
+
 pub fn redirectLink(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
     const code = req.param("code") orelse {
         res.status = 404;

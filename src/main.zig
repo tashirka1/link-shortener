@@ -30,11 +30,12 @@ pub fn main(init: std.process.Init) !void {
     });
     defer db_pool.deinit();
 
-    // run schema
+    // run schema + fts5
     {
         const conn = try db_pool.acquire(init.io);
         defer db_pool.release(init.io, conn);
         try schema.run(conn);
+        try schema.seedFts(conn);
     }
 
     // session
@@ -119,6 +120,7 @@ pub fn main(init: std.process.Init) !void {
     link_group.get("/create-link", link_handler.getCreateLink, .{});
     link_group.post("/create-link", link_handler.postCreateLink, .{});
     link_group.get("/list-link", link_handler.listLinks, .{});
+    link_group.get("/search-link", link_handler.searchLinks, .{});
     link_group.delete("/remove-link/:code", link_handler.removeLink, .{});
 
     // rps benchmark routes
