@@ -6,6 +6,11 @@ cp env-example .env
 make up
 ```
 
+Stop
+```
+kill -9 $(lsof -t -i:8000)
+```
+
 ## Benchmarking
 
 Run `zsh -c 'for i in $(seq 1 1000); do curl -s "http://localhost:8000/rps/ztl-page-insert?payload=prefill" > /dev/null; done'` first to pre-populate the database for SELECT/UPDATE benchmarks.
