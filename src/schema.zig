@@ -52,11 +52,11 @@ pub fn seedFts(conn: zqlite.Conn) !void {
         \\END;
         \\
         \\CREATE TRIGGER IF NOT EXISTS link_ad AFTER DELETE ON link_link BEGIN
-        \\    INSERT INTO link_fts(link_fts, rowid, code, url) VALUES('delete', old.id, old.code, old.url);
+        \\    DELETE FROM link_fts WHERE rowid = old.id;
         \\END;
         \\
         \\CREATE TRIGGER IF NOT EXISTS link_au AFTER UPDATE ON link_link BEGIN
-        \\    INSERT INTO link_fts(link_fts, rowid, code, url) VALUES('delete', old.id, old.code, old.url);
+        \\    DELETE FROM link_fts WHERE rowid = old.id;
         \\    INSERT INTO link_fts(rowid, code, url) VALUES (new.id, new.code, new.url);
         \\END;
         \\
