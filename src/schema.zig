@@ -1,6 +1,6 @@
 const zqlite = @import("zqlite");
 
-const create_tables = 
+const create_tables =
     \\CREATE TABLE IF NOT EXISTS auth_user (
     \\    id INTEGER PRIMARY KEY,
     \\    email TEXT NOT NULL,
@@ -33,6 +33,7 @@ const create_tables =
     \\    key TEXT NOT NULL,
     \\    value TEXT NOT NULL
     \\);
+    \\CREATE INDEX IF NOT EXISTS idx_rps_meta_log_id ON rps_meta(log_id);
 ;
 
 pub fn run(conn: zqlite.Conn) !void {

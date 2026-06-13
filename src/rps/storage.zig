@@ -17,11 +17,17 @@ pub fn insert(conn: *zqlite.Conn, payload: []const u8, ts: i64, duration: i64) !
     return if (rows.next()) |row| row.int(0) else error.InsertFailed;
 }
 
+const selectJoinSql =
+    \\ SELECT rps_log.id, rps_log.payload, rps_log.ts, rps_log.duration, rps_meta.key, rps_meta.value
+    \\ FROM (SELECT id, payload, ts, duration FROM rps_log ORDER BY id DESC LIMIT ?) rps_log
+    \\ LEFT JOIN rps_meta ON rps_log.id = rps_meta.log_id ORDER BY rps_log.id DESC
+;
+
 pub fn selectJoin(conn: *zqlite.Conn, allocator: std.mem.Allocator, limit: usize) ![]JoinRow {
     var list: std.ArrayListAligned(JoinRow, null) = .empty;
 
     var rows = try conn.rows(
-        "SELECT rps_log.id, rps_log.payload, rps_log.ts, rps_log.duration, rps_meta.key, rps_meta.value FROM rps_log LEFT JOIN rps_meta ON rps_log.id = rps_meta.log_id ORDER BY rps_log.id DESC LIMIT ?",
+        selectJoinSql,
         .{@as(i64, @intCast(limit))},
     );
     defer rows.deinit();
@@ -40,7 +46,12 @@ pub fn selectJoin(conn: *zqlite.Conn, allocator: std.mem.Allocator, limit: usize
 }
 
 pub fn updateDurations(conn: *zqlite.Conn, ids: []const i64) !void {
+    try conn.transaction();
+    errdefer conn.rollback();
+
     for (ids) |id| {
         try conn.exec("UPDATE rps_log SET duration = duration + 1 WHERE id = ?", .{id});
     }
+
+    try conn.commit();
 }
